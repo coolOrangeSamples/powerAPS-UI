@@ -6,7 +6,7 @@
 [![coolOrange powerEvents](https://img.shields.io/badge/powerJobs%20Client-26.0.7+-orange.svg)](https://doc.coolorange.com/projects/powerevents/en/stable/)
 [![Autodesk Platform Services](https://img.shields.io/badge/Autodesk%20Platform%20Services-API-blue.svg)](https://aps.autodesk.com/)
 
-![powerAPS-UI](https://github.com/user-attachments/assets/8411cb35-cd58-4812-9597-3c4607d9fd71)
+![powerAPS-UI](https://github.com/user-attachments/assets/34d4cf6c-feab-4fd5-bad1-2ab74cde9331)
 
 ## Disclaimer
 
