@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<AssemblyName>powerAPS.Utils</AssemblyName>
+		<RootNamespace>powerAPS.Utils</RootNamespace>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Resource Include="Resources\coolorange.ico" />
+	</ItemGroup>
+
+</Project>
