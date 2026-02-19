@@ -12,12 +12,12 @@ if ($processName -notin @('Connectivity.VaultPro')) {
 
 function Get-DialogApsAttributeMapping($vaultFolderPath, [Hashtable]$mapping) {
     class DataContext {
-        [System.Collections.ObjectModel.ObservableCollection[powerAPS.Utils.MappingItem]] $Mapping
+        [System.Collections.ObjectModel.ObservableCollection[object]] $Mapping
         [System.Collections.ObjectModel.ObservableCollection[object]] $AccAttributes
         [System.Collections.ObjectModel.ObservableCollection[object]] $VaultProperties
     
         DataContext() {
-            $this.Mapping = New-Object System.Collections.ObjectModel.ObservableCollection[powerAPS.Utils.MappingItem]
+            $this.Mapping = New-Object System.Collections.ObjectModel.ObservableCollection[object]
             $this.AccAttributes = New-Object System.Collections.ObjectModel.ObservableCollection[object]
             $this.VaultProperties = New-Object System.Collections.ObjectModel.ObservableCollection[object]
         }
@@ -28,7 +28,8 @@ function Get-DialogApsAttributeMapping($vaultFolderPath, [Hashtable]$mapping) {
         throw "ACC Project folder properties cannot be found!"
     }
     
-    $hub = Get-ApsAccHub $projectProperties["Hub"]
+    $hubName = $projectProperties["Hub"]
+    $hub = $ApsConnection.Hubs[$hubName].Response
     $project = Get-ApsProject -hub $hub -projectName $projectProperties["Project"]
 
     $projectFilesFolder = Get-ApsProjectFilesFolder $hub $project
@@ -75,7 +76,7 @@ function Get-DialogApsAttributeMapping($vaultFolderPath, [Hashtable]$mapping) {
         $dataGrid = $window.FindName('MappingGrid')
         $toRemove = @($dataGrid.SelectedItems)
 
-        foreach($item in $toRemove) {
+        foreach ($item in $toRemove) {
             if ($null -ne $item) {
                 [void]$dataContext.Mapping.Remove($item)
             }

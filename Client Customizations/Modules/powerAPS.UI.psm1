@@ -14,26 +14,46 @@ and the second one contains custom image resources and types for the WPF dialogs
 #>
 function ApplyVaultTheme($control) {
     $currentTheme = [Autodesk.DataManagement.Client.Framework.Forms.SkinUtils.WinFormsTheme]::Instance.CurrentTheme
-    $md = $control.Resources.MergedDictionaries[0]
-    $pd = $control.Resources.MergedDictionaries[1]
-    if (-not $md) { return }
+    
+    # Find and remove the existing framework theme dictionary (if any)
+    $frameworkAssembly = "Autodesk.DataManagement.Client.Framework.Forms"
+    $existingThemeDicts = @($control.Resources.MergedDictionaries | Where-Object {
+        $_.Source -and $_.Source.OriginalString -match [regex]::Escape($frameworkAssembly)
+    })
 
-    # Add the current theme to the resource dictionary
-    $td = [System.Management.Automation.PSSerializer]::Deserialize([System.Management.Automation.PSSerializer]::Serialize($md, 20))
-    $td.Source = New-Object Uri("pack://application:,,,/Autodesk.DataManagement.Client.Framework.Forms;component/SkinUtils/WPF/Themes/$($currentTheme)Theme.xaml", [System.UriKind]::Absolute)
+    # Clone the first framework dictionary to use as a base for the theme dictionary
+    $baseDictionary = $existingThemeDicts | Select-Object -First 1
+    if (-not $baseDictionary) { return }
+
+    $td = [System.Management.Automation.PSSerializer]::Deserialize(
+        [System.Management.Automation.PSSerializer]::Serialize($baseDictionary, 20)
+    )
+    $td.Source = New-Object Uri(
+        "pack://application:,,,/$frameworkAssembly;component/SkinUtils/WPF/Themes/$($currentTheme)Theme.xaml",
+        [System.UriKind]::Absolute
+    )
+
+    # Preserve all non-framework dictionaries
+    $otherDicts = @($control.Resources.MergedDictionaries | Where-Object {
+        -not $_.Source -or $_.Source.OriginalString -notmatch [regex]::Escape($frameworkAssembly)
+    })
+
+    # Rebuild: theme first, then original framework dicts, then all others
     $control.Resources.MergedDictionaries.Clear()
-    $control.Resources.MergedDictionaries.Add($td);
-    $control.Resources.MergedDictionaries.Add($md);
-    $control.Resources.MergedDictionaries.Add($pd);
+    $control.Resources.MergedDictionaries.Add($td)
+    foreach ($dict in $existingThemeDicts) {
+        $control.Resources.MergedDictionaries.Add($dict)
+    }
+    foreach ($dict in $otherDicts) {
+        $control.Resources.MergedDictionaries.Add($dict)
+    }
 
     if ($control -is [Autodesk.DataManagement.Client.Framework.Forms.Controls.WPF.ThemedWPFWindow]) {
-        # Set Vault to be the owner of the window
         $interopHelper = New-Object System.Windows.Interop.WindowInteropHelper($control)
         $interopHelper.Owner = (Get-Process -Id $PID).MainWindowHandle
 
-        # Set the window style, depending on the current theme
         $styleKey = if ($currentTheme -eq "Default") { "DefaultThemedWindowStyle" } else { "DarkLightThemedWindowStyle" }
-        $control.Style = $control.Resources.MergedDictionaries[0][$styleKey]    
+        $control.Style = $control.Resources.MergedDictionaries[0][$styleKey]
     }
     elseif ($control -is [System.Windows.Controls.ContentControl]) {
         # powerEvents to reload the tab?!

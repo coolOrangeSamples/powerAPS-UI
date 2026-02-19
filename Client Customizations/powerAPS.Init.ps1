@@ -11,22 +11,9 @@ if ($processName -notin @('Connectivity.VaultPro')) {
 }
 
 # Import all modules located in the powerAPS folder
-foreach ($module in Get-Childitem "C:\ProgramData\coolOrange\powerAPS" -Name -Filter "*.psm1") {
-    Import-Module "C:\ProgramData\coolOrange\powerAPS\$module" -Force -Global
-}
+Import-Module C:\ProgramData\coolOrange\powerAPS\powerAPS.Modules.psd1 -Force
 
 function ApsTokenIsValid() {
-    # Re-import all modules in the powerAPS folder, in case anything changed in the scripts - only in development!
-    #foreach ($module in Get-Childitem "C:\ProgramData\coolOrange\powerAPS" -Name -Filter "*.psm1") {
-    #    Import-Module "C:\ProgramData\coolOrange\powerAPS\$module" -Force -Global
-    #}
-
-    # Check if the APS connection is already established
-    # https://doc.coolorange.com/projects/poweraps/en/stable/code_reference/objects/apsconnection/
-    if ($global:APSConnection) {
-        return $true
-    }
-
     $missingRoles = GetMissingRoles @(77, 76)
     if ($missingRoles) {
         $message = "The current user does not have the required permissions: $missingRoles!"
@@ -62,7 +49,13 @@ function ApsTokenIsValid() {
 
     # Connect to APS
     # https://doc.coolorange.com/projects/poweraps/en/stable/code_reference/commandlets/connect-aps/
-    return Connect-APS @arguments
+    $result = Connect-APS @arguments
+    if (-not $result) {
+        $title = "Connection Error"
+        $null = [Autodesk.DataManagement.Client.Framework.Forms.Library]::ShowError($result.Error, $title)
+        return $false
+    }
+    return $true
 }
 
 # Load the powerAPS.Utils.dll according to the PowerShell edition. 

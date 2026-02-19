@@ -6,8 +6,8 @@
 # Copyright (C) 2026 COOLORANGE S.r.l.                                         #
 #==============================================================================#
 
-foreach ($module in Get-Childitem "C:\ProgramData\coolOrange\powerAPS" -Name -Filter "*.psm1") {
-    Import-Module "C:\ProgramData\coolOrange\powerAPS\$module" -Force -Global
+if ($processName -notin @('Connectivity.VaultPro')) {
+	return
 }
 
 function Get-DialogApsContent($hub, $project, $showFiles = $false) {

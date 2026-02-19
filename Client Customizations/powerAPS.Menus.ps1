@@ -50,10 +50,6 @@ Add-VaultMenuItem -Location ToolsMenu -Name "Vault Folder Settings..." -Submenu 
         return
     }
 
-    if (-not (ApsTokenIsValid)) {
-        return
-    }
-
     try {
         $behaviors = GetVaultAccFolderBehaviors $true
     }
@@ -220,7 +216,8 @@ Add-VaultMenuItem -Location FolderContextMenu -Name "Go To ACC Docs Project..." 
         return
     }
 
-    $hub = Get-ApsAccHub $projectProperties["Hub"]
+    $hubName = $projectProperties["Hub"]
+    $hub = $ApsConnection.Hubs[$hubName].Response
     if (-not $hub) {
         return
     }
@@ -250,7 +247,8 @@ Add-VaultMenuItem -Location FolderContextMenu -Name "Go To ACC Build Project..."
         return
     }
 
-    $hub = Get-ApsAccHub $projectProperties["Hub"]
+    $hubName = $projectProperties["Hub"]
+    $hub = $ApsConnection.Hubs[$hubName].Response
     if (-not $hub) {
         return
     }

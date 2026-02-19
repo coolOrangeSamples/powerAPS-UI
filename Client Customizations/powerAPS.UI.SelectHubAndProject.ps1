@@ -65,7 +65,7 @@ function Get-DialogApsHubAndProject($typeFilter = $null, $selectedHub = $null, $
             $projectsItemsSource += New-Object PsObject -Property @{ Project = $project; Type = $type; Name = $project.attributes.name }
         }
         $projectsItemsSource = $projectsItemsSource | Sort-Object -Property Name
-        $projectsItemsSource = $projectsItemsSource | Where-Object { -not $_.Project.attributes.name.Contains("test") -and -not $_.Project.attributes.name.Contains("Test") }
+        #$projectsItemsSource = $projectsItemsSource | Where-Object { -not $_.Project.attributes.name.Contains("test") -and -not $_.Project.attributes.name.Contains("Test") }
         $window.Cursor = $null
         return $projectsItemsSource
     }
